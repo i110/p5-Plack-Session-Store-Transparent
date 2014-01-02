@@ -125,7 +125,7 @@ Fetches session data from caches to origin, and stores the result in outside lay
 
 =item B<store ( %session_id, $session )>
 
-Stores session data in all layers (from caches to origin). If one of the layer throw an exception, this method will try to keep consistency between layers, i.e. remove this session from layers which has already been stored.
+Stores session data in all layers (from caches to origin). If one of the layer throw an exception, this method will try to keep consistency between layers, i.e. remove this session from ouside layers.
 
 =item B<remove ( %session_id )>
 

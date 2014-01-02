@@ -52,7 +52,7 @@ This is a subclass of [Plack::Session::Store](https://metacpan.org/pod/Plack::Se
 
 - __store ( %session\_id, $session )__
 
-    Stores session data in all layers (from caches to origin). If one of the layer throw an exception, this method will try to keep consistency between layers, i.e. remove this session from layers which has already been stored.
+    Stores session data in all layers (from caches to origin). If one of the layer throw an exception, this method will try to keep consistency between layers, i.e. remove this session from ouside layers.
 
 - __remove ( %session\_id )__
 
