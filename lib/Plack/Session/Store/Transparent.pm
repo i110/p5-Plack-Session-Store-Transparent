@@ -109,8 +109,6 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 	
 =head1 DESCRIPTION
 
-Plack::Session::Store::Transparent is ...
-
 This will manipulate multiple session stores transparently.
 This is a subclass of L<Plack::Session::Store> and implements its full interface.
 
