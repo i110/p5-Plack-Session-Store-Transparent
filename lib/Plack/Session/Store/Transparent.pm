@@ -104,9 +104,6 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 		$app;
 	};
 	
-	
-	# with custom serializer/deserializer
-	
 =head1 DESCRIPTION
 
 This will manipulate multiple session stores transparently.

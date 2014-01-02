@@ -32,9 +32,6 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 		$app;
 	};
 	
-	
-	# with custom serializer/deserializer
-	
 
 # DESCRIPTION
 
