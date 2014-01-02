@@ -38,8 +38,6 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 
 # DESCRIPTION
 
-Plack::Session::Store::Transparent is ...
-
 This will manipulate multiple session stores transparently.
 This is a subclass of [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) and implements its full interface.
 

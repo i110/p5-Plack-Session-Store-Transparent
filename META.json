@@ -53,5 +53,16 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/i110/p5-Plack-Session-Store-Transparent/issues"
+      },
+      "homepage" : "https://github.com/i110/p5-Plack-Session-Store-Transparent",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/i110/p5-Plack-Session-Store-Transparent.git",
+         "web" : "https://github.com/i110/p5-Plack-Session-Store-Transparent"
+      }
+   },
    "version" : "0.01"
 }
