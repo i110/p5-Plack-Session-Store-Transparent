@@ -18,16 +18,12 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 	builder {
 		enable 'Session',
 			store => Plack::Session::Store::Transparent->new(
-				layers => [
-					# origin
-					Plack::Session::Store::DBI->new(
-						get_dbh => sub { DBI->connect(@connect_args) }
-					),
-					# cache
-					Plack::Session::Store::Cache->new(
-						cache => CHI->new(driver => 'FastMmap')
-					)
-				]
+				origin => Plack::Session::Store::DBI->new(
+					get_dbh => sub { DBI->connect(@connect_args) }
+				),
+				cache => Plack::Session::Store::Cache->new(
+					cache => CHI->new(driver => 'FastMmap')
+				)
 			);
 		$app;
 	};
@@ -42,9 +38,8 @@ This is a subclass of [Plack::Session::Store](https://metacpan.org/pod/Plack::Se
 
 - __new ( %args )__
 
-    The constructor expects the _layers_ argument to be an arrayref,
-    which contains [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) instances, otherwise it will throw an exception.
-    The layers arguments should be sorted such that the origin is the first, and cache layers follow it.
+    The constructor expects the _origin_ argument to be a instance of [Plack::Session::Store](https://metacpan.org/pod/Plack::Session::Store) instance, and _cache_ argument to be a instance of it or an arrayref which contains it, otherwise it will throw an exception.
+    If the cache arguments is an arrayref, the elements of it will be accessed from the first.
 
 - __fetch ( %session\_id )__
 

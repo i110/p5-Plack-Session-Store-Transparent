@@ -10,8 +10,8 @@ use t::lib::HashSession;
 
 t::lib::TestSessionHash::run_all_tests(
 	store  => Plack::Session::Store::Transparent->new(
-		layers => [
-			t::lib::HashSession->new,
+		origin => t::lib::HashSession->new,
+		cache => [
 			t::lib::HashSession->new,
 			t::lib::HashSession->new,
 		]

@@ -3,20 +3,45 @@ use 5.008005;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw(blessed);
 
 our $VERSION = "0.01";
 
 use parent 'Plack::Session::Store';
 
 use Plack::Util::Accessor qw(
-	layers
+	origin
+	cache
 );
+
+sub _check_interface {
+	my ($class, $obj) = @_;
+	return blessed $obj
+		&& $obj->can('fetch')
+		&& $obj->can('store')
+		&& $obj->can('remove');
+}
 
 sub new {
 	my ($class, %args) = @_;
 
-	unless ($args{layers}) {
-		croak "missing mandatory parameter 'layers'";
+	unless ($args{origin}) {
+		croak "missing mandatory parameter 'origin'";
+	}
+
+	
+	{
+		# check origin
+		croak 'origin requires fetch, store and remove method'
+			unless $class->_check_interface($args{origin});
+
+		# check cache
+		my @caches = ( ref($args{cache}) eq 'ARRAY' ? @{ $args{cache} } : $args{cache} );
+		for (@caches) {
+			next unless $_;
+			croak 'cache requires fetch, store and remove method'
+				unless $class->_check_interface($_);
+		}
 	}
 
 	return bless { %args }, $class;
@@ -26,7 +51,7 @@ sub fetch {
 	my ($self, $session_id) = @_;
 
 	my @uppers;
-	for my $layer (reverse @{ $self->layers }) {
+	for my $layer ($self->_layers) {
 		if (my $session = $layer->fetch($session_id)) {
 			# ignore exceptions for availability
 			eval {
@@ -44,7 +69,7 @@ sub store {
 	my ($self, $session_id, $session) = @_;
 
 	my @uppers;
-	for my $layer (reverse @{ $self->layers }) {
+	for my $layer ($self->_layers) {
 		eval {
 			$layer->store($session_id, $session);
 		};
@@ -60,9 +85,20 @@ sub store {
 sub remove {
 	my ($self, $session_id) = @_;
 
-	for my $layer (reverse @{ $self->layers }) {
+	for my $layer ($self->_layers) {
 		$layer->remove($session_id);
 	}
+}
+
+sub _caches {
+	my ($self) = @_;
+	return [] unless $self->cache;
+	return ref($self->cache) eq 'ARRAY' ? $self->cache : [ $self->cache ];
+}
+
+sub _layers {
+	my ($self) = @_;
+	return (@{ $self->_caches }, $self->origin);
 }
 
 1;
@@ -90,16 +126,12 @@ Plack::Session::Store::Transparent - Session store container which provides tran
 	builder {
 		enable 'Session',
 			store => Plack::Session::Store::Transparent->new(
-				layers => [
-					# origin
-					Plack::Session::Store::DBI->new(
-						get_dbh => sub { DBI->connect(@connect_args) }
-					),
-					# cache
-					Plack::Session::Store::Cache->new(
-						cache => CHI->new(driver => 'FastMmap')
-					)
-				]
+				origin => Plack::Session::Store::DBI->new(
+					get_dbh => sub { DBI->connect(@connect_args) }
+				),
+				cache => Plack::Session::Store::Cache->new(
+					cache => CHI->new(driver => 'FastMmap')
+				)
 			);
 		$app;
 	};
@@ -115,9 +147,8 @@ This is a subclass of L<Plack::Session::Store> and implements its full interface
 
 =item B<new ( %args )>
 
-The constructor expects the I<layers> argument to be an arrayref,
-which contains L<Plack::Session::Store> instances, otherwise it will throw an exception.
-The layers arguments should be sorted such that the origin is the first, and cache layers follow it.
+The constructor expects the I<origin> argument to be a instance of L<Plack::Session::Store> instance, and I<cache> argument to be a instance of it or an arrayref which contains it, otherwise it will throw an exception.
+If the cache arguments is an arrayref, the elements of it will be accessed from the first.
 
 =item B<fetch ( %session_id )>
 

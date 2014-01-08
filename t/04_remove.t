@@ -8,8 +8,8 @@ use t::lib::HashSession;
 
 subtest 'simple', sub {
 	my $t = Plack::Session::Store::Transparent->new(
-		layers => [
-			t::lib::HashSession->new,
+		origin => t::lib::HashSession->new,
+		cache => [
 			t::lib::HashSession->new,
 			t::lib::HashSession->new,
 		]
@@ -20,16 +20,17 @@ subtest 'simple', sub {
 
 	$t->remove('foo');
 	ok(! $t->fetch('foo'));
-	ok(! $t->fetch('foo')) for @{ $t->layers };
+	ok(! $t->origin->fetch('foo'));
+	ok(! $t->fetch('foo')) for @{ $t->cache };
 	
 };
 
 subtest 'keep consistency', sub {
 	my $t = Plack::Session::Store::Transparent->new(
-		layers => [
+		origin => t::lib::HashSession->new,
+		cache => [
 			t::lib::HashSession->new,
 			t::lib::HashSession->new(dies_on_remove => 1),
-			t::lib::HashSession->new,
 		]
 	);
 	$t->store('foo', 'bar');
@@ -39,9 +40,9 @@ subtest 'keep consistency', sub {
 		$t->remove('foo');
 	} qr/die for testing in remove/;
 
-	is($t->layers->[0]->fetch('foo'), 'bar');
-	is($t->layers->[1]->fetch('foo'), 'bar');
-	ok(! $t->layers->[2]->fetch('foo'));
+	is($t->origin->fetch('foo'), 'bar');
+	ok(! $t->cache->[0]->fetch('foo'));
+	is($t->cache->[1]->fetch('foo'), 'bar');
 	is($t->fetch('foo'), 'bar');
 };
 
