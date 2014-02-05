@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use parent 'Plack::Session::Store';
 
