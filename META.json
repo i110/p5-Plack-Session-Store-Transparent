@@ -49,6 +49,7 @@
       "test" : {
          "requires" : {
             "Plack::Session::Store" : "0.20",
+            "Test::Exception" : "0.32",
             "Test::More" : "0.98"
          }
       }
